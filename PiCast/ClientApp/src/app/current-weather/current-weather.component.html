@@ -1,0 +1,43 @@
+
+<div class="row">
+  <p *ngIf="!city"><em>Loading...</em></p>
+</div>
+<table>
+  <tr>
+    <td colspan="4">
+      <div *ngIf="temp">
+        <span style="font-size: 4em">{{temp}} ºC</span>
+      </div>
+    </td>
+    <td>
+      <img [src]="icon">
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2">
+      <div *ngIf="city">
+      ↑ {{tempMax}}<br/>↓ {{tempMin}}
+      </div>
+    </td>
+    <td colspan="2">
+      <div *ngIf="description">
+        <div class="col-sm-12 col-xs-6 row" style="text-transform: capitalize">{{description}} <br /> {{humidity}}%</div>
+      </div>
+    </td>
+    <td>
+      <div *ngIf="humidity">
+        <div *ngIf="sunrise && sunset">↑ {{sunrise | date: 'HH:mm'}} <br /> ↓ {{sunset | date: 'H:mm'}}</div>
+      </div>
+    </td>
+  </tr>
+  <tr>
+    <td>&nbsp;</td>
+    <td colspan="3">&nbsp;</td>
+    <td>&nbsp;</td>
+  </tr>
+  <tr>
+    <td colspan="2"><div style="font-size: 2em" *ngIf="time && date">{{time}}</div></td>
+    <td><div *ngIf="city">{{city}}</div></td>
+    <td colspan="2"><div style="font-size: 2em;text-transform: capitalize" *ngIf="time && date">{{date}}</div></td>
+  </tr>
+</table>

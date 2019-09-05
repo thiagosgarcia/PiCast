@@ -1,0 +1,13 @@
+/* You can add global styles to this file, and also import other style files */
+.row {
+  margin-right: 10px;
+  margin-left: 10px;
+  width: 100%;
+}
+
+table {
+  height: 420px;
+  width: 290px;
+  text-align: center;
+}
+
