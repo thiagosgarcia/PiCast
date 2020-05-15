@@ -6,27 +6,27 @@
   <tr>
     <td colspan="4">
       <div *ngIf="temp">
-        <span style="font-size: 4em">{{temp}} ºC</span>
+        <span style="font-size: 4em">{{temp}}º</span>
       </div>
     </td>
     <td>
       <img [src]="icon">
     </td>
   </tr>
-  <tr>
-    <td colspan="2">
-      <div *ngIf="city">
+  <tr style="font-size: x-large">
+    <td style="width: 90px">
+      <div *ngIf="city" style="max-width: 90px">
       ↑ {{tempMax}}<br/>↓ {{tempMin}}
       </div>
     </td>
-    <td colspan="2">
+    <td colspan="3"  style="width: 140px">
       <div *ngIf="description">
-        <div class="col-sm-12 col-xs-6 row" style="text-transform: capitalize">{{description}} <br /> {{humidity}}%</div>
+        <div style="text-transform: capitalize;  hyphens: auto; max-width: 140px">{{description}} <br />{{humidity}}%</div>
       </div>
     </td>
-    <td>
-      <div *ngIf="humidity">
-        <div *ngIf="sunrise && sunset">↑ {{sunrise | date: 'HH:mm'}} <br /> ↓ {{sunset | date: 'H:mm'}}</div>
+    <td style="width: 90px">
+      <div *ngIf="humidity" style="max-width: 90px">
+        <div *ngIf="sunrise && sunset">↑ {{sunrise | date: 'HH:mm'}} <br />↓ {{sunset | date: 'H:mm'}}</div>
       </div>
     </td>
   </tr>
