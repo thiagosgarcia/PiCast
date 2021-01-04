@@ -17,7 +17,7 @@ namespace PiCast.Controllers
     public class CurrentWeatherController
     {
         public IConfiguration Config;
-        private static List<string> Cities = new List<string>() { "Curitiba", "Saquarema" };
+        private static List<string> Cities = new List<string>() { "Bacaxa", "Saquarema" };
         private static List<string> Countries = new List<string>() { "br", "br" };
         private static string Lang = "pt";
         private static string Unit = "metric";
@@ -90,5 +90,30 @@ namespace PiCast.Controllers
             return await response.Content.ReadAsAsync<dynamic>();
         }
 
+        [HttpGet("/api/Forecast")]
+        [HttpPost("/api/Forecast")]
+        public async Task<IEnumerable<dynamic>> GetForecast()
+        {
+            var totalCities = Cities.Count;
+            var time = DateTime.Now;
+
+            var index = (int)time.TimeOfDay.TotalMinutes % totalCities;
+            var city = Cities[index];
+            var country = Countries[index];
+
+            var request =
+                $"data/2.5/forecast?q={city},{country}&APPID={Config["OpenWeatherApiKey"]}&lang={Lang}&units={Unit}";
+
+            var client = new HttpClient()
+            {
+                BaseAddress = new Uri("http://api.openweathermap.org")
+            };
+            var response = await client.GetAsync(request);
+
+            if (!response.IsSuccessStatusCode)
+                return null;
+
+            return await response.Content.ReadAsAsync<dynamic>();
+        }
     }
 }

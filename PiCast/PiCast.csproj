@@ -10,6 +10,7 @@
 
     <!-- Set this to true if you enable server-side prerendering -->
     <BuildServerSideRenderer>false</BuildServerSideRenderer>
+    <UserSecretsId>4ee423db-c68f-4dfd-b22f-4cc7d50403b3</UserSecretsId>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -21,7 +22,7 @@
     <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.Caching.Memory" version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration" version="2.2.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Builder" version="2.2.0" />
+    <!--<PackageReference Include="Microsoft.Extensions.Configuration.Builder" version="2.2.0" />-->
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" version="2.2.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" version="2.2.4" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Abstractions" version="2.2.4" />

@@ -16,28 +16,34 @@
   <tr style="font-size: x-large">
     <td style="width: 90px">
       <div *ngIf="city" style="max-width: 90px">
-      ↑ {{tempMax}}<br/>↓ {{tempMin}}
+        ~{{feelsLike}}º
       </div>
     </td>
-    <td colspan="3"  style="width: 140px">
+    <td colspan="3" style="width: 140px">
       <div *ngIf="description">
         <div style="text-transform: capitalize;  hyphens: auto; max-width: 140px">{{description}} <br />{{humidity}}%</div>
       </div>
     </td>
     <td style="width: 90px">
       <div *ngIf="humidity" style="max-width: 90px">
-        <div *ngIf="sunrise && sunset">↑ {{sunrise | date: 'HH:mm'}} <br />↓ {{sunset | date: 'H:mm'}}</div>
+        <div *ngIf="sunrise && sunset">{{sunrise | date: 'HH:mm'}} ↑<br />{{sunset | date: 'H:mm'}} ↓ </div>
       </div>
     </td>
   </tr>
   <tr>
-    <td>&nbsp;</td>
-    <td colspan="3">&nbsp;</td>
-    <td>&nbsp;</td>
+    <td colspan="2"><div style="font-size: 2em" *ngIf="time && date">{{time}}</div></td>
+    <td><div *ngIf="city" style="text-align: center">{{city}}</div></td>
+    <td colspan="2"><div style="font-size: 2em;text-transform: capitalize" *ngIf="time && date">{{date}}</div></td>
   </tr>
   <tr>
-    <td colspan="2"><div style="font-size: 2em" *ngIf="time && date">{{time}}</div></td>
-    <td><div *ngIf="city">{{city}}</div></td>
-    <td colspan="2"><div style="font-size: 2em;text-transform: capitalize" *ngIf="time && date">{{date}}</div></td>
+    <td>&nbsp;{{f_time|date : 'dd/MM'}}<br />{{f_time|date : 'HH:mm'}}</td>
+    <td colspan="2">
+      &nbsp;<span style="text-transform: capitalize; hyphens: auto; max-width: 100px">{{f_description}}</span>
+      <br/>{{f_humidity}}%
+    </td>
+    <td>&nbsp; {{f_temp}}º<br />~{{f_feelsLike}}º</td>
+    <td>
+      <img style="max-width: 100px" [src]="f_icon">
+    </td>
   </tr>
 </table>

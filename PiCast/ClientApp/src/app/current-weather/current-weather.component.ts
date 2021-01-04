@@ -9,6 +9,7 @@ import { interval } from 'rxjs';
 export class CurrentWeatherComponent implements OnInit, OnDestroy {
   public city: string;
   public temp: number;
+  public feelsLike: number;
   public tempMin: number;
   public tempMax: number;
   public humidity: string;
@@ -25,18 +26,41 @@ export class CurrentWeatherComponent implements OnInit, OnDestroy {
   public timeInterval: any;
   public cleanRun: any;
 
+  public f_time: Date;
+  public f_temp: number;
+  public f_feelsLike: number;
+  public f_humidity: string;
+  public f_description: string;
+  public f_icon: string;
+  public forecastInterval: any;
+  public forecastUrl: string;
 
   constructor(private http: HttpClient, @Inject('BASE_URL') baseUrl: string) {
     this.baseUrl = baseUrl;
+    this.requestForecast();
     this.requestWeather();
     this.requestTime();
     this.cleanRun = true;
   }
 
+  private requestForecast() {
+    this.http.get<any>(this.baseUrl + 'api/Forecast').subscribe(result => {
+      this.f_temp = Math.round(result.list[1].main.temp * 10) / 10;
+      this.f_feelsLike = Math.round(result.list[1].main.feels_like * 10) / 10;
+      this.f_humidity = result.list[1].main.humidity;
+      this.f_description = result.list[1].weather[0].description;
+      this.f_time = new Date(result.list[1].dt * 1000);
+
+      this.f_icon = `http://openweathermap.org/img/wn/${result.list[1].weather[0].icon}.png`;
+    },
+      error => console.error(error));
+  }
+
   private requestWeather() {
     this.http.get<any>(this.baseUrl + 'api/CurrentWeather').subscribe(result => {
       this.city = result.name;
-      this.temp = Math.round(result.main.temp * 10) / 10 ;
+      this.temp = Math.round(result.main.temp * 10) / 10;
+      this.feelsLike = Math.round(result.main.feels_like * 10) / 10;
       this.tempMin = Math.floor(result.main.temp_min);
       this.tempMax = Math.ceil(result.main.temp_max);
       this.humidity = result.main.humidity;
@@ -69,12 +93,14 @@ export class CurrentWeatherComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
+    this.forecastInterval = setInterval(() => this.forecastInterval(), 60000);
     this.weatherInterval = setInterval(() => this.requestWeather(), 60000);
     this.timeInterval = setInterval(() => this.requestTime(), 100);
   }
   ngOnDestroy() {
     clearInterval(this.weatherInterval);
     clearInterval(this.timeInterval);
+    clearInterval(this.forecastInterval);
   }
 }
 
