@@ -26,7 +26,7 @@ namespace WebApplication2
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
             services.AddScoped<IService<Configuration>, Service<Configuration>>();
             services.AddScoped<IRepository<Configuration>, Repository<Configuration>>();
@@ -40,6 +40,7 @@ namespace WebApplication2
         });
 
             services.AddScoped<EntityContext>();
+            services.AddSingleton<IConfiguration>(Configuration);
 
             SQLitePCL.Batteries.Init();
 
@@ -81,7 +82,7 @@ namespace WebApplication2
                     x.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
                     x.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
                 })
-                .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+                .SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
         }
 

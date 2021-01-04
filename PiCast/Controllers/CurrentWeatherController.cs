@@ -7,6 +7,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Razor.Language.Intermediate;
+using Microsoft.Extensions.Configuration;
 using PiCast.Model;
 using PiCast.Service;
 
@@ -15,25 +16,38 @@ namespace PiCast.Controllers
     [Route("api/[controller]")]
     public class CurrentWeatherController
     {
+        public IConfiguration Config;
         private static List<string> Cities = new List<string>() { "Curitiba", "Saquarema" };
+        private static List<string> Countries = new List<string>() { "br", "br" };
+        private static string Lang = "pt";
+        private static string Unit = "metric";
         private IService<Configuration> _service;
-        private string ApiKey = "2454dee9bd72c126f0a19acd04993d3b";
-        public CurrentWeatherController(IService<Configuration> service)
+        public CurrentWeatherController(IService<Configuration> service, IConfiguration config)
         {
+            Config = config;
             _service = service;
         }
 
         [HttpGet("AddCity")]
-        public async Task<bool> AddCity(string city)
+        public async Task<bool> AddCity(string city, string country = "br")
         {
             if (!Cities.Any(x => x.Equals(city, StringComparison.InvariantCultureIgnoreCase)))
+            {
                 Cities.Add(city);
+                Countries.Add(country);
+            }
 
             return true;
         }
 
+        [HttpGet("SetLocale/{lang}/{unit}")]
+        public async Task<string> SetLang(string lang, string unit)
+        {
+            return string.Join("|", Lang = lang, Unit = unit);
+        }
+
         [HttpGet("ListCities")]
-        public Task<List<string>> ListCities(string city)
+        public Task<List<string>> ListCities()
         {
             return Task.FromResult(Cities);
         }
@@ -41,14 +55,13 @@ namespace PiCast.Controllers
         [HttpGet("RemoveCity")]
         public async Task<int> RemoveCity(string city)
         {
-            if (!Cities.Any())
+            if (!Cities.Any(x => x.Equals(city, StringComparison.InvariantCultureIgnoreCase)))
                 return 0;
-            if (Cities.Any(x => x.Equals(city, StringComparison.InvariantCultureIgnoreCase)))
-            {
-                Cities.RemoveAt(Cities.FindIndex(x => x.Equals(city, StringComparison.InvariantCultureIgnoreCase)));
-                return 1;
-            }
-            return 0;
+
+            var index = Cities.FindIndex(x => x.Equals(city, StringComparison.InvariantCultureIgnoreCase));
+            Cities.RemoveAt(index);
+            Countries.RemoveAt(index);
+            return 1;
         }
 
         [HttpGet("")]
@@ -60,12 +73,10 @@ namespace PiCast.Controllers
 
             var index = (int)time.TimeOfDay.TotalMinutes % totalCities;
             var city = Cities[index];
-            //var city = /*_service.Get().SingleOrDefault(x => x.Name == "CurrentCity")?.Value ??*/ "Curitiba";
-
-            var country = /*_service.Get().SingleOrDefault(x => x.Name == "CurrentCountry")?.Value ??*/ "br";
+            var country = Countries[index];
 
             var request =
-                $"data/2.5/weather?q={city},{country}&APPID={ApiKey}&lang=pt&units=metric";
+                $"data/2.5/weather?q={city},{country}&APPID={Config["OpenWeatherApiKey"]}&lang={Lang}&units={Unit}";
 
             var client = new HttpClient()
             {

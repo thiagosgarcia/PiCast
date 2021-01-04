@@ -23,12 +23,14 @@ export class CurrentWeatherComponent implements OnInit, OnDestroy {
   public time: string;
   public date: string;
   public timeInterval: any;
+  public cleanRun: any;
 
 
   constructor(private http: HttpClient, @Inject('BASE_URL') baseUrl: string) {
     this.baseUrl = baseUrl;
     this.requestWeather();
     this.requestTime();
+    this.cleanRun = true;
   }
 
   private requestWeather() {
@@ -51,6 +53,15 @@ export class CurrentWeatherComponent implements OnInit, OnDestroy {
   private requestTime() {
 
     this.http.get<any>(this.baseUrl + 'api/CurrentTime').subscribe(result => {
+      if (!!this.time && this.time !== result.time && !!this.cleanRun) {
+        clearInterval(this.weatherInterval);
+        clearInterval(this.timeInterval);
+        this.weatherInterval = setInterval(() => this.requestWeather(), 60000);
+        this.timeInterval = setInterval(() => this.requestTime(), 60000);
+
+        this.requestWeather();
+        this.cleanRun = false;
+      }
       this.time = result.time;
       this.date = result.readableDate;
     },
@@ -59,7 +70,7 @@ export class CurrentWeatherComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.weatherInterval = setInterval(() => this.requestWeather(), 60000);
-    this.timeInterval = setInterval(() => this.requestTime(), 2000);
+    this.timeInterval = setInterval(() => this.requestTime(), 100);
   }
   ngOnDestroy() {
     clearInterval(this.weatherInterval);
