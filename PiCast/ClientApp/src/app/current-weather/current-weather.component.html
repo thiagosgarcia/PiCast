@@ -2,48 +2,88 @@
 <div class="row">
   <p *ngIf="!city"><em>Loading...</em></p>
 </div>
-<table>
-  <tr>
-    <td colspan="4">
-      <div *ngIf="temp">
-        <span style="font-size: 4em">{{temp}}º</span>
-      </div>
-    </td>
-    <td>
-      <img [src]="icon">
-    </td>
-  </tr>
-  <tr style="font-size: x-large">
-    <td style="width: 90px">
-      <div *ngIf="city" style="max-width: 90px">
-        ~{{feelsLike}}º
-      </div>
-    </td>
-    <td colspan="3" style="width: 140px">
-      <div *ngIf="description">
-        <div style="text-transform: capitalize;  hyphens: auto; max-width: 140px">{{description}} <br />{{humidity}}%</div>
-      </div>
-    </td>
-    <td style="width: 90px">
-      <div *ngIf="humidity" style="max-width: 90px">
-        <div *ngIf="sunrise && sunset">{{sunrise | date: 'HH:mm'}} ↑<br />{{sunset | date: 'H:mm'}} ↓ </div>
-      </div>
-    </td>
-  </tr>
-  <tr>
-    <td colspan="2"><div style="font-size: 2em" *ngIf="time && date">{{time}}</div></td>
-    <td><div *ngIf="city" style="text-align: center">{{city}}</div></td>
-    <td colspan="2"><div style="font-size: 2em;text-transform: capitalize" *ngIf="time && date">{{date}}</div></td>
-  </tr>
-  <tr>
-    <td>&nbsp;{{f_time|date : 'dd/MM'}}<br />{{f_time|date : 'HH:mm'}}</td>
-    <td colspan="2">
-      &nbsp;<span style="text-transform: capitalize; hyphens: auto; max-width: 100px">{{f_description}}</span>
-      <br/>{{f_humidity}}%
-    </td>
-    <td>&nbsp; {{f_temp}}º<br />~{{f_feelsLike}}º</td>
-    <td>
-      <img style="max-width: 100px" [src]="f_icon">
-    </td>
-  </tr>
-</table>
+<div *ngIf="!showForecast">
+  <table>
+    <tr>
+      <td colspan="4">
+        <div *ngIf="temp">
+          <span style="font-size: 4em">{{temp}}º</span>
+        </div>
+      </td>
+      <td>
+        <img [src]="icon">
+      </td>
+    </tr>
+    <tr style="font-size: x-large">
+      <td style="width: 90px">
+        <div *ngIf="city" style="max-width: 90px">
+          ~{{feelsLike}}º
+        </div>
+      </td>
+      <td colspan="3" style="width: 140px">
+        <div *ngIf="description">
+          <div style="text-transform: capitalize;  hyphens: auto; max-width: 140px; font-size: 0.8em">{{description}} <br />{{humidity}}%</div>
+        </div>
+      </td>
+      <td style="width: 90px">
+        <div *ngIf="humidity" style="max-width: 90px">
+          <div *ngIf="sunrise && sunset">{{sunrise | date: 'HH:mm'}} ↑<br />{{sunset | date: 'H:mm'}} ↓ </div>
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td colspan="1"><div style="font-size: 2em" *ngIf="time && date">{{time}}</div></td>
+      <td colspan="3"><div *ngIf="city" style="text-align: center">{{city}}</div></td>
+      <td colspan="1"><div style="font-size: 2em;text-transform: capitalize" *ngIf="time && date">{{date}}</div></td>
+    </tr>
+    <tr *ngIf="!!forecastList[1]">
+      <td>&nbsp;{{forecastList[1].dt * 1000|date : 'dd/MM'}}<br />{{forecastList[1].dt * 1000|date : 'HH:mm'}}</td>
+      <td colspan="2">
+        &nbsp;<span style="text-transform: capitalize;hyphens: auto; max-width: 100px; font-size: 0.8em">{{forecastList[1].weather[0].description}}</span>
+        <br />{{forecastList[1].main.humidity}}%
+      </td>
+      <td>
+        &nbsp; {{forecastList[1].main.temp|number: '1.0-1'}}º<br />
+        ~{{forecastList[1].main.feels_like|number: '1.0-1'}}º
+      </td>
+      <td>
+        <img style="max-width: 100px" [src]="iconPrefix + forecastList[1].weather[0].icon + '.png'">
+      </td>
+    </tr>
+  </table>
+</div>
+<div *ngIf="showForecast">
+  <table>
+    <tr>
+      <td colspan="2">&nbsp;</td>
+      <td style="font-weight: bolder">{{city}}</td>
+      <td colspan="2">&nbsp;</td>
+    </tr>
+    <tr>
+      <td style="font-weight: bold">&nbsp;{{date}}<br />{{time}}</td>
+      <td style="font-weight: bold" colspan="2">
+        &nbsp;<span style="text-transform: capitalize; hyphens: auto; max-width: 100px; font-size: 0.8em">{{description}}</span>
+        <br />{{humidity}}%
+      </td>
+      <td style="font-weight: bold">&nbsp; {{temp}}º<br />~{{feelsLike}}º</td>
+      <td>
+        <img style="max-width: 100px" [src]="iconMini">
+      </td>
+    </tr>
+    <tr *ngFor="let item of forecastList; index as i;">
+      <td *ngIf="i % 4 == 1">&nbsp;{{item.dt * 1000|date : 'dd/MM'}}<br />{{item.dt * 1000|date : 'HH:mm'}}</td>
+      <td *ngIf="i % 4 == 1" colspan="2">
+        &nbsp;<span style="text-transform: capitalize;
+hyphens: auto; max-width: 100px; font-size: 0.8em">{{item.weather[0].description}}</span>
+        <br />{{item.main.humidity}}%
+      </td>
+      <td *ngIf="i % 4 == 1">
+        &nbsp; {{item.main.temp|number: '1.0-1'}}º<br />
+        ~{{item.main.feels_like|number: '1.0-1'}}º
+      </td>
+      <td *ngIf="i % 4 == 1">
+        <img style="max-width: 100px" [src]="iconPrefix + item.weather[0].icon + '.png'">
+      </td>
+    </tr>
+  </table>
+</div>

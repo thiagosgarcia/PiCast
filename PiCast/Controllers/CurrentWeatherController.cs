@@ -66,7 +66,7 @@ namespace PiCast.Controllers
 
         [HttpGet("")]
         [HttpPost("")]
-        public async Task<IEnumerable<dynamic>> GetCurrentWeather()
+        public async Task<IEnumerable<dynamic>> GetWeather(string operation = "weather")
         {
             var totalCities = Cities.Count;
             var time = DateTime.Now;
@@ -76,7 +76,7 @@ namespace PiCast.Controllers
             var country = Countries[index];
 
             var request =
-                $"data/2.5/weather?q={city},{country}&APPID={Config["OpenWeatherApiKey"]}&lang={Lang}&units={Unit}";
+                $"data/2.5/{operation}?q={city},{country}&APPID={Config["OpenWeatherApiKey"]}&lang={Lang}&units={Unit}";
 
             var client = new HttpClient()
             {
@@ -92,28 +92,9 @@ namespace PiCast.Controllers
 
         [HttpGet("/api/Forecast")]
         [HttpPost("/api/Forecast")]
-        public async Task<IEnumerable<dynamic>> GetForecast()
+        public Task<IEnumerable<dynamic>> GetForecast()
         {
-            var totalCities = Cities.Count;
-            var time = DateTime.Now;
-
-            var index = (int)time.TimeOfDay.TotalMinutes % totalCities;
-            var city = Cities[index];
-            var country = Countries[index];
-
-            var request =
-                $"data/2.5/forecast?q={city},{country}&APPID={Config["OpenWeatherApiKey"]}&lang={Lang}&units={Unit}";
-
-            var client = new HttpClient()
-            {
-                BaseAddress = new Uri("http://api.openweathermap.org")
-            };
-            var response = await client.GetAsync(request);
-
-            if (!response.IsSuccessStatusCode)
-                return null;
-
-            return await response.Content.ReadAsAsync<dynamic>();
+            return GetWeather("forecast");
         }
     }
 }
