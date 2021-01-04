@@ -52,9 +52,11 @@ export class CurrentWeatherComponent implements OnInit, OnDestroy {
     this.showForecast = false;
     this.iconPrefix = "http://openweathermap.org/img/wn/";
 
-    this.dayOfWeek = (date: any) => {
-      if (!date)
+    this.dayOfWeek = (date: any, threadSafe: boolean) => {
+      if (!date) {
         date = new Date().getTime();
+        this.lastDayOfWeek = null;
+      }
 
       const weekday = new Array(7);
       weekday[0] = "dom";
@@ -69,7 +71,9 @@ export class CurrentWeatherComponent implements OnInit, OnDestroy {
       if (n === this.lastDayOfWeek)
         return "";
 
-      this.lastDayOfWeek = n;
+      if (!threadSafe)
+        this.lastDayOfWeek = n;
+
       return n;
     };
   }

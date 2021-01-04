@@ -3,11 +3,11 @@
   <p *ngIf="!city"><em>Loading...</em></p>
 </div>
 <div *ngIf="!showForecast">
-  <table>
+  <table style="font-size: 1.1em; width: 320px">
     <tr>
       <td colspan="4">
         <div *ngIf="temp">
-          <span style="font-size: 4em">{{temp}}º</span>
+          <span style="font-size: 4em; font-weight: bold">{{temp}}º</span>
         </div>
       </td>
       <td colspan="2">
@@ -32,11 +32,20 @@
       </td>
     </tr>
     <tr>
-      <td colspan="1"><div style="font-size: 2em" *ngIf="time && date">{{time}}</div></td>
-      <td colspan="3"><div *ngIf="city" style="text-align: center">{{city}}</div></td>
-      <td colspan="2"><div style="font-size: 2em;text-transform: capitalize" *ngIf="time && date">{{date}}</div></td>
+      <td colspan="3"><div style="font-size: 2.5em; font-weight: bolder" *ngIf="time && date">{{time}}</div></td>
+      <td colspan="3"><div style="font-size: 2.5em; font-weight: bolder; text-transform: capitalize" *ngIf="time && date">{{date}}</div></td>
     </tr>
-    <tr style="font-size: 1.3em;" *ngIf="!!forecastList[1]">
+    <tr>
+      <td colspan="6">
+        <div *ngIf="city" style="font-size: 1.5em; text-align: center">{{city}}</div>
+      </td>
+    </tr>
+    <tr>
+      <td colspan="6">
+        &nbsp;
+      </td>
+    </tr>
+    <tr style="font-size: 1.3em; background: #111" *ngIf="!!forecastList[1]">
       <td>&nbsp;{{forecastList[1].dt * 1000|date : 'dd/MM'}}<br />{{forecastList[1].dt * 1000|date : 'HH:mm'}}</td>
       <td colspan="3">
         &nbsp;<span style="text-transform: capitalize;hyphens: auto; max-width: 100px; font-size: 0.6em">{{forecastList[1].weather[0].description}}</span>
@@ -53,14 +62,14 @@
   </table>
 </div>
 <div *ngIf="showForecast">
-  <table style="font-size: 1.3em">
+  <table style="font-size: 1.3em; width: 320px">
     <tr>
       <td colspan="2">&nbsp;</td>
       <td colspan="2" style="font-weight: bolder">{{city}}</td>
       <td colspan="2">&nbsp;</td>
     </tr>
     <tr>
-      <td style="font-weight: bold">&nbsp;{{dayOfWeek()}}<br />{{time}}</td>
+      <td style="font-weight: bold; font-size: 1.5em;">&nbsp;{{time}}</td>
       <td colspan="3" style="font-weight: bold">
         &nbsp;<span style="text-transform: capitalize; hyphens: auto; max-width: 100px; font-size: 0.6em">{{description}}</span>
         <br />{{humidity}}%
@@ -70,8 +79,8 @@
         <img style="max-width: 100px" [src]="iconMini">
       </td>
     </tr>
-    <tr *ngFor="let item of forecastList; index as i;">
-      <td *ngIf="i % 4 == 1">&nbsp;{{dayOfWeek(item.dt * 1000)}}<br />{{item.dt * 1000|date : 'HH:mm'}}</td>
+    <tr *ngFor="let item of forecastList; index as i;" [ngStyle]="{'background-color': (i % 16 < 9) ? '#151515' : '#0A0A0A'}">
+      <td *ngIf="i % 4 == 1">&nbsp;{{dayOfWeek(item.dt * 1000)}}<br *ngIf="!!dayOfWeek(item.dt * 1000, true)"/>{{item.dt * 1000|date : 'HH:mm'}}</td>
       <td colspan="3" *ngIf="i % 4 == 1">
         &nbsp;<span style="text-transform: capitalize;
 hyphens: auto; max-width: 100px; font-size: 0.6em">{{item.weather[0].description}}</span>
