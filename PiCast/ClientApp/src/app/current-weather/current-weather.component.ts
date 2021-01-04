@@ -40,6 +40,9 @@ export class CurrentWeatherComponent implements OnInit, OnDestroy {
   public showInterval: any;
   public iconPrefix: string;
 
+  public dayOfWeek: any;
+  public lastDayOfWeek: string;
+
   constructor(private http: HttpClient, @Inject('BASE_URL') baseUrl: string) {
     this.baseUrl = baseUrl;
     this.requestForecast();
@@ -48,6 +51,27 @@ export class CurrentWeatherComponent implements OnInit, OnDestroy {
     this.cleanRun = true;
     this.showForecast = false;
     this.iconPrefix = "http://openweathermap.org/img/wn/";
+
+    this.dayOfWeek = (date: any) => {
+      if (!date)
+        date = new Date().getTime();
+
+      const weekday = new Array(7);
+      weekday[0] = "dom";
+      weekday[1] = "seg";
+      weekday[2] = "ter";
+      weekday[3] = "qua";
+      weekday[4] = "qui";
+      weekday[5] = "sex";
+      weekday[6] = "sáb";
+
+      var n = weekday[new Date(date).getDay()];
+      if (n === this.lastDayOfWeek)
+        return "";
+
+      this.lastDayOfWeek = n;
+      return n;
+    };
   }
 
   private requestForecast() {
@@ -94,7 +118,7 @@ export class CurrentWeatherComponent implements OnInit, OnDestroy {
         clearInterval(this.showInterval);
         this.weatherInterval = setInterval(() => this.requestWeather(), 60000);
         this.timeInterval = setInterval(() => this.requestTime(), 60000);
-        this.showInterval = setInterval(() => this.showForecast = !this.showForecast, 30000);
+        this.showInterval = setInterval(() => this.showForecast = !this.showForecast, 15000);
 
         this.requestWeather();
         this.cleanRun = false;
@@ -107,8 +131,9 @@ export class CurrentWeatherComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.weatherInterval = setInterval(() => this.requestWeather(), 60000);
-    this.timeInterval = setInterval(() => this.requestTime(), 100);
+    this.timeInterval = setInterval(() => this.requestTime(), 500);
   }
+
   ngOnDestroy() {
     clearInterval(this.weatherInterval);
     clearInterval(this.timeInterval);
