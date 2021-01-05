@@ -1,64 +1,41 @@
 
-<div class="row">
-  <p *ngIf="!city"><em>Loading...</em></p>
-</div>
 <div *ngIf="!showForecast">
   <table style="font-size: 1.1em; width: 320px">
-    <tr>
-      <td colspan="4">
-        <div *ngIf="temp">
-          <span style="font-size: 4em; font-weight: bold">{{temp | number: '1.0-1'}}&deg;</span>
-        </div>
-      </td>
-      <td colspan="2">
-        <img [src]="icon">
-      </td>
+    <tr main-weather-card [temp]="temp" [icon]="icon"></tr>
+    <tr weather-conditions-card
+        [city]="city"
+        [description]="description"
+        [feelsLike]="feelsLike"
+        [humidity]="humidity"
+        [sunrise]="sunrise"
+        [sunset]="sunset"
+        style="font-size: x-large">
     </tr>
-    <tr style="font-size: x-large">
-      <td style="width: 90px">
-        <div *ngIf="city" style="max-width: 90px">
-          &sim;{{feelsLike}}&deg;
-        </div>
-      </td>
-      <td colspan="3" style="width: 140px">
-        <div *ngIf="description">
-          <div style="text-transform: capitalize;  hyphens: auto; max-width: 140px; font-size: 0.8em;">{{description}}<br />{{humidity | percent}}</div>
-        </div>
-      </td>
-      <td colspan="2" style="width: 90px">
-        <div *ngIf="humidity" style="max-width: 90px">
-          <div *ngIf="sunrise && sunset">{{sunrise | date: 'HH:mm'}} ↑<br />{{sunset | date: 'H:mm'}} ↓ </div>
-        </div>
-      </td>
-    </tr>
-    <tr>
-      <td colspan="3"><div style="font-size: 2.5em; font-weight: bolder" *ngIf="time && date">{{time}}</div></td>
-      <td colspan="3"><div style="font-size: 2.5em; font-weight: bolder; text-transform: capitalize" *ngIf="time && date">{{date}}</div></td>
+    <tr current-time-card [time]="time" [date]="date">
     </tr>
     <tr>
       <td colspan="6">
         <div *ngIf="city" style="font-size: 1.5em; text-align: center">{{city}}</div>
       </td>
     </tr>
-    <tr>
-      <td colspan="6">
-        &nbsp;
-      </td>
-    </tr>
-    <tr style="font-size: 1.3em; background: #111" *ngIf="!!forecastList[1]">
-      <td>{{forecastList[1].dt * 1000 | date : 'dd/MM'}}<br />{{forecastList[1].dt * 1000 | date : 'HH:mm'}}</td>
-      <td colspan="3" style="line-height: 0.8">
-        <p style="text-transform: capitalize; hyphens: auto; font-size: 0.85em; line-height: 1; margin-bottom: 0.5em">{{forecastList[1].weather[0].description}}</p>
-        {{forecastList[1].main.humidity / 100 | percent}}
-      </td>
-      <td>
-        &emsp;{{forecastList[1].main.temp | number: '1.0-1'}}&deg;<br />
-        &sim;{{forecastList[1].main.feels_like | number: '1.0-0'}}&deg;
-      </td>
-      <td>
-        <img style="max-width: 100px" [src]="iconPrefix + forecastList[1].weather[0].icon + '.png'">
-      </td>
-    </tr>
+    <tr app-forecast-card
+        [time]="forecastList[1].dt"
+        [description]="forecastList[1].weather[0].description"
+        [humidity]="forecastList[1].main.humidity"
+        [temp]="forecastList[1].main.temp"
+        [feelsLike]="forecastList[1].main.feels_like"
+        [dayOfWeekToShow]="dayOfWeek(forecastList[1].dt * 1000, true)"
+        [icon]="forecastList[1].weather[0].icon"
+        style="font-size: 1.3em; background: #111"></tr>
+    <tr app-forecast-card
+        [time]="forecastList[8].dt"
+        [description]="forecastList[8].weather[0].description"
+        [humidity]="forecastList[8].main.humidity"
+        [temp]="forecastList[8].main.temp"
+        [feelsLike]="forecastList[8].main.feels_like"
+        [dayOfWeekToShow]="dayOfWeek(forecastList[8].dt * 1000, true)"
+        [icon]="forecastList[8].weather[0].icon"
+        style="font-size: 1.3em; background: #222"></tr>
   </table>
 </div>
 <div *ngIf="showForecast">
@@ -68,30 +45,26 @@
       <td colspan="2" style="font-weight: bolder">{{city}}</td>
       <td colspan="2">&nbsp;</td>
     </tr>
-    <tr>
-      <td style="font-weight: bold; font-size: 1.5em;">{{time}}</td>
-      <td colspan="3" style="font-weight: bold; line-height: 0.1">
-        <p style="text-transform: capitalize; hyphens: auto; padding: 0 5px; font-size: 0.7em; line-height: 1; margin-bottom: 0.5em">{{description}}</p>
-        {{humidity | percent}}
-      </td>
-      <td style="font-weight: bold">{{temp | number: '1.0-1'}}&deg;<br />&sim;{{feelsLike | number: '1.0-0'}}&deg;</td>
-      <td>
-        <img style="max-width: 100px" [src]="iconMini">
-      </td>
-    </tr>
-    <tr *ngFor="let item of forecastList; index as i;" [ngStyle]="{'background-color': !!dayIndex(item.dt * 1000) ? '#151515' : '#0A0A0A' }">
-      <td *ngIf="i % 4 == 0">{{dayOfWeek(item.dt * 1000)}}<br *ngIf="!!dayOfWeek(item.dt * 1000, true)" />{{item.dt * 1000|date : 'HH:mm'}}</td>
-      <td colspan="3" *ngIf="i % 4 == 0" style="line-height: 0.8">
-        <p style="text-transform: capitalize; hyphens: auto; font-size: 0.85em; line-height: 1; margin-bottom: 0.5em">{{item.weather[0].description}}</p>
-        {{item.main.humidity / 100 | percent}}
-      </td>
-      <td *ngIf="i % 4 == 0">
-        {{item.main.temp | number: '1.0-1'}}&deg;<br />
-        &sim;{{item.main.feels_like | number: '1.0-0'}}&deg;
-      </td>
-      <td *ngIf="i % 4 == 0">
-        <img style="max-width: 100px" [src]="iconPrefix + item.weather[0].icon + '.png'">
-      </td>
-    </tr>
+    <tr app-forecast-card
+        [currentWeather]="true"
+        [time]="time"
+        [description]="description"
+        [humidity]="humidity"
+        [temp]="temp"
+        [feelsLike]="feelsLike"
+        [icon]="iconMini"></tr>
+
+    <ng-container *ngFor="let item of forecastList; index as i;">
+      <tr app-forecast-card
+          *ngIf="i % 4 == 0"
+          [time]="item.dt"
+          [description]="item.weather[0].description"
+          [humidity]="item.main.humidity"
+          [temp]="item.main.temp"
+          [feelsLike]="item.main.feels_like"
+          [dayOfWeekToShow]="dayOfWeek(item.dt * 1000)"
+          [icon]="item.weather[0].icon"
+          [ngStyle]="{'background-color': !!dayIndex(item.dt * 1000) ? '#151515' : '#0A0A0A' }"></tr>
+    </ng-container>
   </table>
 </div>

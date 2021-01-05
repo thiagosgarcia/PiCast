@@ -1,0 +1,9 @@
+
+<td colspan="4">
+  <div *ngIf="temp">
+    <span style="font-size: 4em; font-weight: bold">{{temp | number: '1.0-1'}}&deg;</span>
+  </div>
+</td>
+<td colspan="2">
+  <img [src]="icon">
+</td>

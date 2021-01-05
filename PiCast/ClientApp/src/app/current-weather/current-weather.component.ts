@@ -44,6 +44,9 @@ export class CurrentWeatherComponent implements OnInit, OnDestroy {
   public dayIndex: any;
   public lastDayOfWeek: string;
 
+  public lastUpdate: number;
+  public tickInterval: any;
+
   constructor(private http: HttpClient, @Inject('BASE_URL') baseUrl: string) {
     this.baseUrl = baseUrl;
     this.requestForecast();
@@ -87,9 +90,9 @@ export class CurrentWeatherComponent implements OnInit, OnDestroy {
 
   private requestForecast() {
     this.http.get<any>(this.baseUrl + 'api/Forecast').subscribe(result => {
-      this.f_temp = Math.round(result.list[1].main.temp * 10) / 10;
-      this.f_feelsLike = Math.round(result.list[1].main.feels_like * 10) / 10;
-      this.f_humidity = result.list[1].main.humidity / 100;
+      this.f_temp = result.list[1].main.temp;
+      this.f_feelsLike = result.list[1].main.feels_like;
+      this.f_humidity = result.list[1].main.humidity;
       this.f_description = result.list[1].weather[0].description;
       this.f_time = new Date(result.list[1].dt * 1000);
 
@@ -103,18 +106,19 @@ export class CurrentWeatherComponent implements OnInit, OnDestroy {
   private requestWeather() {
     this.http.get<any>(this.baseUrl + 'api/CurrentWeather').subscribe(result => {
       this.city = result.name;
-      this.temp = Math.round(result.main.temp * 10) / 10;
-      this.feelsLike = Math.round(result.main.feels_like * 10) / 10;
+      this.temp = result.main.temp;
+      this.feelsLike = result.main.feels_like;
       this.tempMin = Math.floor(result.main.temp_min);
       this.tempMax = Math.ceil(result.main.temp_max);
-      this.humidity = result.main.humidity / 100;
+      this.humidity = result.main.humidity;
       this.description = result.weather[0].description;
 
       this.sunrise = new Date(result.sys.sunrise * 1000);
       this.sunset = new Date(result.sys.sunset * 1000);
 
       this.icon = `${this.iconPrefix}${result.weather[0].icon}@2x.png`;
-      this.iconMini = `${this.iconPrefix}${result.weather[0].icon}.png`;
+      this.iconMini = result.weather[0].icon;
+      this.lastUpdate = new Date().getTime();
     },
       error => console.error(error));
     this.requestForecast();
@@ -141,14 +145,24 @@ export class CurrentWeatherComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.weatherInterval = setInterval(() => this.requestWeather(), 60000);
     this.timeInterval = setInterval(() => this.requestTime(), 500);
+
+    this.tickInterval = setInterval(() => {
+        if (!this.time)
+          return;
+        if (this.time.indexOf(":") > 0)
+          this.time = this.time.replace(":", " "); //colon => no-break space
+        else
+          this.time = this.time.replace(" ", ":"); //no-break space => colon
+      },
+      1000);
   }
 
   ngOnDestroy() {
     clearInterval(this.weatherInterval);
     clearInterval(this.timeInterval);
     clearInterval(this.showInterval);
+    clearInterval(this.tickInterval);
   }
 }
 

@@ -10,6 +10,10 @@ import { HomeComponent } from './home/home.component';
 import { CounterComponent } from './counter/counter.component';
 import { FetchDataComponent } from './fetch-data/fetch-data.component';
 import { CurrentWeatherComponent } from './current-weather/current-weather.component';
+import { ForecastCardComponent } from './forecast-card/forecast-card.component';
+import { MainWeatherCardComponent } from './current-weather/main-weather-card.component';
+import { WeatherConditionsCardComponent } from './current-weather/weather-conditions-card.component';
+import { CurrentTimeCardComponent } from './current-weather/current-time-card.component';
 
 @NgModule({
   declarations: [
@@ -18,7 +22,11 @@ import { CurrentWeatherComponent } from './current-weather/current-weather.compo
     HomeComponent,
     CounterComponent,
     FetchDataComponent,
-    CurrentWeatherComponent
+    CurrentWeatherComponent,
+    ForecastCardComponent,
+    MainWeatherCardComponent,
+    WeatherConditionsCardComponent,
+    CurrentTimeCardComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
