@@ -22,7 +22,7 @@
       </td>
       <td colspan="3" style="width: 140px">
         <div *ngIf="description">
-          <div style="text-transform: capitalize;  hyphens: auto; max-width: 140px; font-size: 0.8em;">{{description}} <br />{{humidity| percent}}</div>
+          <div style="text-transform: capitalize;  hyphens: auto; max-width: 140px; font-size: 0.8em;">{{description}}<br />{{humidity | percent}}</div>
         </div>
       </td>
       <td colspan="2" style="width: 90px">
@@ -48,8 +48,8 @@
     <tr style="font-size: 1.3em; background: #111" *ngIf="!!forecastList[1]">
       <td>{{forecastList[1].dt * 1000 | date : 'dd/MM'}}<br />{{forecastList[1].dt * 1000 | date : 'HH:mm'}}</td>
       <td colspan="3" style="line-height: 0.8">
-        <p style="text-transform: capitalize;hyphens: auto; max-width: 100px; font-size: 0.6em; line-height: 1">{{forecastList[1].weather[0].description}}</p>
-       {{forecastList[1].main.humidity / 100 | percent}}
+        <p style="text-transform: capitalize; hyphens: auto; font-size: 0.85em; line-height: 1; margin-bottom: 0.5em">{{forecastList[1].weather[0].description}}</p>
+        {{forecastList[1].main.humidity / 100 | percent}}
       </td>
       <td>
         &emsp;{{forecastList[1].main.temp | number: '1.0-1'}}&deg;<br />
@@ -62,7 +62,7 @@
   </table>
 </div>
 <div *ngIf="showForecast">
-  <table style="font-size: 1.3em; width: 320px">
+  <table style="font-size: 1.4em; width: 320px">
     <tr>
       <td colspan="2">&nbsp;</td>
       <td colspan="2" style="font-weight: bolder">{{city}}</td>
@@ -71,22 +71,22 @@
     <tr>
       <td style="font-weight: bold; font-size: 1.5em;">{{time}}</td>
       <td colspan="3" style="font-weight: bold; line-height: 0.1">
-        <p style="text-transform: capitalize; hyphens: auto; max-width: 100px; font-size: 0.7em; line-height: 1">{{description}}</p>
+        <p style="text-transform: capitalize; hyphens: auto; padding: 0 5px; font-size: 0.7em; line-height: 1; margin-bottom: 0.5em">{{description}}</p>
         {{humidity | percent}}
       </td>
-      <td style="font-weight: bold">&emsp;{{temp | number: '1.0-1'}}&deg;<br />&sim;{{feelsLike | number: '1.0-0'}}&deg;</td>
+      <td style="font-weight: bold">{{temp | number: '1.0-1'}}&deg;<br />&sim;{{feelsLike | number: '1.0-0'}}&deg;</td>
       <td>
         <img style="max-width: 100px" [src]="iconMini">
       </td>
     </tr>
-    <tr *ngFor="let item of forecastList; index as i;" [ngStyle]="{'background-color': !!dayIndex(item.dt * 1000) ? '#0A0A0A' : '#151515'}">
-      <td *ngIf="i % 4 == 0">{{dayOfWeek(item.dt * 1000)}}<br *ngIf="!!dayOfWeek(item.dt * 1000, true)"/>{{item.dt * 1000|date : 'HH:mm'}}</td>
+    <tr *ngFor="let item of forecastList; index as i;" [ngStyle]="{'background-color': !!dayIndex(item.dt * 1000) ? '#151515' : '#0A0A0A' }">
+      <td *ngIf="i % 4 == 0">{{dayOfWeek(item.dt * 1000)}}<br *ngIf="!!dayOfWeek(item.dt * 1000, true)" />{{item.dt * 1000|date : 'HH:mm'}}</td>
       <td colspan="3" *ngIf="i % 4 == 0" style="line-height: 0.8">
-        <p style="text-transform: capitalize; hyphens: auto; max-width: 100px; font-size: 0.7em; line-height: 1">{{item.weather[0].description}}</p>
+        <p style="text-transform: capitalize; hyphens: auto; font-size: 0.85em; line-height: 1; margin-bottom: 0.5em">{{item.weather[0].description}}</p>
         {{item.main.humidity / 100 | percent}}
       </td>
       <td *ngIf="i % 4 == 0">
-        &emsp;{{item.main.temp | number: '1.0-1'}}&deg;<br />
+        {{item.main.temp | number: '1.0-1'}}&deg;<br />
         &sim;{{item.main.feels_like | number: '1.0-0'}}&deg;
       </td>
       <td *ngIf="i % 4 == 0">
