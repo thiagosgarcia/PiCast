@@ -12,7 +12,7 @@ export class CurrentWeatherComponent implements OnInit, OnDestroy {
   public feelsLike: number;
   public tempMin: number;
   public tempMax: number;
-  public humidity: string;
+  public humidity: number;
   public description: string;
   public weatherInterval: any;
   public baseUrl: string;
@@ -30,7 +30,7 @@ export class CurrentWeatherComponent implements OnInit, OnDestroy {
   public f_time: Date;
   public f_temp: number;
   public f_feelsLike: number;
-  public f_humidity: string;
+  public f_humidity: number;
   public f_description: string;
   public f_icon: string;
   public forecastUrl: string;
@@ -41,6 +41,7 @@ export class CurrentWeatherComponent implements OnInit, OnDestroy {
   public iconPrefix: string;
 
   public dayOfWeek: any;
+  public dayIndex: any;
   public lastDayOfWeek: string;
 
   constructor(private http: HttpClient, @Inject('BASE_URL') baseUrl: string) {
@@ -51,6 +52,12 @@ export class CurrentWeatherComponent implements OnInit, OnDestroy {
     this.cleanRun = true;
     this.showForecast = false;
     this.iconPrefix = "http://openweathermap.org/img/wn/";
+
+    this.dayIndex = (date: any) => {
+      var dayIndex = new Date(date).getDay();
+      var todayIndex = new Date().getDay();
+      return (dayIndex - todayIndex) % 2 === 0;
+    }
 
     this.dayOfWeek = (date: any, threadSafe: boolean) => {
       if (!date) {
@@ -82,7 +89,7 @@ export class CurrentWeatherComponent implements OnInit, OnDestroy {
     this.http.get<any>(this.baseUrl + 'api/Forecast').subscribe(result => {
       this.f_temp = Math.round(result.list[1].main.temp * 10) / 10;
       this.f_feelsLike = Math.round(result.list[1].main.feels_like * 10) / 10;
-      this.f_humidity = result.list[1].main.humidity;
+      this.f_humidity = result.list[1].main.humidity / 100;
       this.f_description = result.list[1].weather[0].description;
       this.f_time = new Date(result.list[1].dt * 1000);
 
@@ -100,7 +107,7 @@ export class CurrentWeatherComponent implements OnInit, OnDestroy {
       this.feelsLike = Math.round(result.main.feels_like * 10) / 10;
       this.tempMin = Math.floor(result.main.temp_min);
       this.tempMax = Math.ceil(result.main.temp_max);
-      this.humidity = result.main.humidity;
+      this.humidity = result.main.humidity / 100;
       this.description = result.weather[0].description;
 
       this.sunrise = new Date(result.sys.sunrise * 1000);
