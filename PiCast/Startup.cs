@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SpaServices.AngularCli;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
@@ -31,6 +32,7 @@ namespace WebApplication2
             services.AddScoped<IService<Configuration>, Service<Configuration>>();
             services.AddScoped<IRepository<Configuration>, Repository<Configuration>>();
 
+            services.AddSingleton<IMemoryCache, MemoryCache>();
             services.AddScoped<EntityContext>();
 
             // In production, the Angular files will be served from this directory

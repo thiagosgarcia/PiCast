@@ -7,6 +7,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Razor.Language.Intermediate;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using PiCast.Model;
 using PiCast.Service;
@@ -17,14 +18,17 @@ namespace PiCast.Controllers
     public class CurrentWeatherController
     {
         public IConfiguration Config;
+        private readonly IMemoryCache _cache;
         private static List<string> Cities = new List<string>() { "Bacaxa", "Saquarema" };
         private static List<string> Countries = new List<string>() { "br", "br" };
         private static string Lang = "pt";
         private static string Unit = "metric";
         private IService<Configuration> _service;
-        public CurrentWeatherController(IService<Configuration> service, IConfiguration config)
+        public CurrentWeatherController(IService<Configuration> service, IConfiguration config,
+            IMemoryCache cache)
         {
             Config = config;
+            _cache = cache;
             _service = service;
         }
 
@@ -74,9 +78,15 @@ namespace PiCast.Controllers
             var index = (int)time.TimeOfDay.TotalMinutes % totalCities;
             var city = Cities[index];
             var country = Countries[index];
+            var apiKey = Config["OpenWeatherApiKey"];
+
+            var cacheKey = $"{apiKey}.{operation}.{city}.{country}.{Lang}.{Unit}";
+
+            if (_cache.TryGetValue(cacheKey, out dynamic value)) 
+                return value;
 
             var request =
-                $"data/2.5/{operation}?q={city},{country}&APPID={Config["OpenWeatherApiKey"]}&lang={Lang}&units={Unit}";
+                $"data/2.5/{operation}?q={city},{country}&APPID={apiKey}&lang={Lang}&units={Unit}";
 
             var client = new HttpClient()
             {
@@ -87,7 +97,10 @@ namespace PiCast.Controllers
             if (!response.IsSuccessStatusCode)
                 return null;
 
-            return await response.Content.ReadAsAsync<dynamic>();
+            value = await response.Content.ReadAsAsync<dynamic>();
+            _cache.Set(cacheKey, (object)value, TimeSpan.FromSeconds(100));
+
+            return value;
         }
 
         [HttpGet("/api/Forecast")]
