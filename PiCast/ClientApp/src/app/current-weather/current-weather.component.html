@@ -1,5 +1,5 @@
 
-<div *ngIf="!showForecast">
+<div *ngIf="!showForecast && !!forecastList && city">
   <table style="font-size: 1.1em; width: 320px">
     <tr main-weather-card [temp]="temp" [icon]="icon"></tr>
     <tr weather-conditions-card
@@ -18,6 +18,11 @@
         <div *ngIf="city" style="font-size: 1.5em; text-align: center">{{city}}</div>
       </td>
     </tr>
+    <tr *ngIf="!isHalted">
+      <td colspan="6">
+        &nbsp;
+      </td>
+    </tr>
     <tr app-forecast-card
         [time]="forecastList[1].dt"
         [description]="forecastList[1].weather[0].description"
@@ -28,17 +33,22 @@
         [icon]="forecastList[1].weather[0].icon"
         style="font-size: 1.3em; background: #111"></tr>
     <tr app-forecast-card
-        [time]="forecastList[8].dt"
-        [description]="forecastList[8].weather[0].description"
-        [humidity]="forecastList[8].main.humidity"
-        [temp]="forecastList[8].main.temp"
-        [feelsLike]="forecastList[8].main.feels_like"
-        [dayOfWeekToShow]="dayOfWeek(forecastList[8].dt * 1000, true)"
-        [icon]="forecastList[8].weather[0].icon"
+        [time]="forecastList[2].dt"
+        [description]="forecastList[2].weather[0].description"
+        [humidity]="forecastList[2].main.humidity"
+        [temp]="forecastList[2].main.temp"
+        [feelsLike]="forecastList[2].main.feels_like"
+        [dayOfWeekToShow]="dayOfWeek(forecastList[1].dt * 1000, true) == dayOfWeek(forecastList[2].dt * 1000, true) ? '' : dayOfWeek(forecastList[2].dt * 1000, true)"
+        [icon]="forecastList[2].weather[0].icon"
         style="font-size: 1.3em; background: #222"></tr>
+    <tr *ngIf="isHalted">
+      <td colspan="6">
+        Atualizado: {{lastUpdate | date: 'HH:mm.ss'}}
+      </td>
+    </tr>
   </table>
 </div>
-<div *ngIf="showForecast">
+<div *ngIf="showForecast && !!forecastList && city">
   <table style="font-size: 1.4em; width: 320px">
     <tr>
       <td colspan="2">&nbsp;</td>
