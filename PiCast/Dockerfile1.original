@@ -13,7 +13,7 @@ COPY . .
 
 FROM restore as build
 WORKDIR "/src/PiCast"
-RUN dotnet build "PiCast.csproj" -c Release -o /app/build --no-restore
+RUN dotnet build "PiCast.csproj" -c Release -o /app/build  --no-restore
 
 FROM build AS publish
 RUN dotnet publish "PiCast.csproj" -c Release -o /app/publish --no-restore
