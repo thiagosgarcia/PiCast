@@ -30,13 +30,12 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.Abstractions" version="2.2.4" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Analyzers" version="2.2.4" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" version="2.2.4" />
-    <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.2.0" PrivateAssets="All" />
+    <!--<PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.2.0" PrivateAssets="All" />-->
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.10.9" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Kubernetes.Tools.Targets" Version="1.1.0" />
     <PackageReference Include="System.Data.SQLite.Core" Version="1.0.110" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite.Core" Version="2.2.4" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SQLite" Version="2.2.4" />
-    <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.2.0" PrivateAssets="All" />
 
     <PackageReference Include="Swashbuckle.AspNetCore" Version="1.2.0" />
     <PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="1.2.0" />
