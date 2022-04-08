@@ -886,3 +886,9 @@ typings/
 
 
 package-lock.json
+
+PiCast/ClientApp/.angular/
+
+PiCast/.idea/
+
+old/PiCast/.config/

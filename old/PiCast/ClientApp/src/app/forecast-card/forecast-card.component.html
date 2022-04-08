@@ -1,0 +1,19 @@
+
+<td [style.font-weight]="!!currentWeather ? 'bold' : 'normal'"
+    [style.font-size]="!!currentWeather ? '1.5em' : 'inherit'">
+  {{dayOfWeekToShow}}<br *ngIf="!!dayOfWeekToShow" />{{ !!currentWeather ? time : time * 1000 | date : 'HH:mm'}}
+</td>
+
+<td colspan="3" style="line-height: 0.8" [style.font-weight]="!!currentWeather ? 'bold' : 'normal'">
+  <p style="text-transform: capitalize; hyphens: auto; padding: 0 5px; font-size: 0.85em; line-height: 1; margin-bottom: 0.5em">{{description}}</p>
+  {{humidity / 100 | percent}}
+</td>
+
+<td [style.font-weight]="!!currentWeather ? 'bold' : 'normal'">
+  {{temp | number: '1.0-1'}}&deg;<br />
+  &sim;{{feelsLike | number: '1.0-0'}}&deg;
+</td>
+
+<td>
+  <img style="max-width: 100px" [src]="iconPrefix + icon + '.png'">
+</td>

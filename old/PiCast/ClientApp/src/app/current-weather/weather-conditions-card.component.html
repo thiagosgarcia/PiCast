@@ -1,0 +1,16 @@
+
+<td style="width: 90px">
+  <div *ngIf="city" style="max-width: 90px">
+    &sim;{{feelsLike | number: '1.0-0'}}&deg;
+  </div>
+</td>
+<td colspan="3" style="width: 140px">
+  <div *ngIf="description">
+    <div style="text-transform: capitalize; hyphens: auto; max-width: 140px; font-size: 0.8em;">{{description}}<br/>{{humidity / 100 | percent}}</div>
+  </div>
+</td>
+<td colspan="2" style="width: 90px">
+  <div *ngIf="humidity" style="max-width: 90px">
+    <div *ngIf="sunrise && sunset">{{sunrise | date: 'HH:mm'}} ↑<br/>{{sunset | date: 'H:mm'}} ↓ </div>
+  </div>
+</td>

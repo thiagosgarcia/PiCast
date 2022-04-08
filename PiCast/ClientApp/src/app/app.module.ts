@@ -1,4 +1,4 @@
-  import { BrowserModule } from '@angular/platform-browser';
+import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
@@ -9,11 +9,11 @@ import { NavMenuComponent } from './nav-menu/nav-menu.component';
 import { HomeComponent } from './home/home.component';
 import { CounterComponent } from './counter/counter.component';
 import { FetchDataComponent } from './fetch-data/fetch-data.component';
-import { CurrentWeatherComponent } from './current-weather/current-weather.component';
-import { ForecastCardComponent } from './forecast-card/forecast-card.component';
-import { MainWeatherCardComponent } from './current-weather/main-weather-card.component';
-import { WeatherConditionsCardComponent } from './current-weather/weather-conditions-card.component';
-import { CurrentTimeCardComponent } from './current-weather/current-time-card.component';
+import {CurrentWeatherComponent} from "./current-weather/current-weather.component";
+import {MainWeatherCardComponent} from "./current-weather/main-weather-card.component";
+import {WeatherConditionsCardComponent} from "./current-weather/weather-conditions-card.component";
+import {CurrentTimeCardComponent} from "./current-weather/current-time-card.component";
+import {ForecastCardComponent} from "./forecast-card/forecast-card.component";
 
 @NgModule({
   declarations: [
@@ -23,10 +23,10 @@ import { CurrentTimeCardComponent } from './current-weather/current-time-card.co
     CounterComponent,
     FetchDataComponent,
     CurrentWeatherComponent,
-    ForecastCardComponent,
     MainWeatherCardComponent,
     WeatherConditionsCardComponent,
-    CurrentTimeCardComponent
+    CurrentTimeCardComponent,
+    ForecastCardComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),

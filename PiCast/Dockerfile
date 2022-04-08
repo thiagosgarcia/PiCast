@@ -1,22 +1,25 @@
-#See https://aka.ms/containerfastmode to understand how Visual Studio uses this Dockerfile to build your images for faster debugging.
-
-FROM mcr.microsoft.com/dotnet/core/aspnet:2.1-stretch-slim AS base
+﻿FROM mcr.microsoft.com/dotnet/aspnet:6.0 AS base
 WORKDIR /app
 EXPOSE 80
 EXPOSE 443
 
-FROM mcr.microsoft.com/dotnet/core/sdk:2.1-stretch AS restore
-WORKDIR /src
-COPY ["PiCast/PiCast.csproj", "PiCast/"]
-RUN dotnet restore "PiCast/PiCast.csproj"
-COPY . .
+FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 
-FROM restore as build
-WORKDIR "/src/PiCast"
-RUN dotnet build "PiCast.csproj" -c Release -o /app/build --no-restore
+# Install Node.js
+RUN curl -fsSL https://deb.nodesource.com/setup_14.x | bash - \
+    && apt-get install -y \
+        nodejs \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /src
+COPY ["PiCast.csproj", "./"]
+RUN dotnet restore "PiCast.csproj"
+COPY . .
+WORKDIR "/src/"
+RUN dotnet build "PiCast.csproj" -c Release -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "PiCast.csproj" -c Release -o /app/publish --no-restore
+RUN dotnet publish "PiCast.csproj" -c Release -o /app/publish
 
 FROM base AS final
 WORKDIR /app

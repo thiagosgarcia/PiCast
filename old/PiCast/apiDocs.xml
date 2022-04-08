@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>PiCast</name>
+    </assembly>
+    <members>
+        <member name="M:PiCast.Controllers.ReadOnlyController`1.Get(System.String)">
+            <summary>
+            Generic solution for Get with a filter
+            </summary>
+            <param name="filter">value to filter (depends on context)</param>
+            <returns>Enumeration of DbItems</returns>
+        </member>
+        <member name="M:PiCast.Controllers.ReadOnlyController`1.Get(System.Int32)">
+            <summary>
+            Generic solution for GetById with a filter
+            </summary>
+            <param name="id">Entity ID to return from database</param>
+            <returns>DBEntity with referred ID</returns>
+        </member>
+        <member name="M:PiCast.Controllers.CrudController`1.Post(`0)">
+            <summary>
+            Generic solution for a Inset into the database
+            </summary>
+            <param name="value">Entity to be inserted</param>
+            <returns>The inserted entity</returns>
+        </member>
+        <member name="M:PiCast.Controllers.CrudController`1.Put(System.Int32,`0)">
+            <summary>
+            Generic solution for a Update into the database
+            </summary>
+            <param name="id">Entity's ID to be updated</param>
+            <param name="value">Entity to be updated</param>
+            <returns>The updated entity</returns>
+        </member>
+        <member name="M:PiCast.Controllers.CrudController`1.Delete(System.Int32)">
+            <summary>
+            Generic solution for a Delete into the database
+            </summary>
+            <param name="id">Entity's ID to be deleted</param>
+            <returns>The number of items deleted</returns>
+        </member>
+    </members>
+</doc>
