@@ -41,7 +41,7 @@ public class ReadOnlyService<T> : IReadOnlyService<T> where T : Entity
 
 public class Service<T> : ReadOnlyService<T>, IService<T> where T : Entity
 {
-    private readonly IRepository<T> _repository;
+    private new readonly IRepository<T> _repository;
 
     public Service(IRepository<T> repository) : base(repository)
     {

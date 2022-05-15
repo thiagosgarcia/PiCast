@@ -37,7 +37,7 @@ public abstract class ReadOnlyController<T> : ControllerBase where T : Entity
 [ApiController]
 public abstract class CrudController<T> : ReadOnlyController<T> where T : Entity
 {
-    protected readonly IService<T> _service;
+    protected new readonly IService<T> _service;
 
     public CrudController(IService<T> service) : base(service)
     {
