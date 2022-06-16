@@ -16,7 +16,7 @@ namespace PiCast.AlertsApp;
 public static class WeatherAlert
 {
     [FunctionName("WeatherAlert")]
-    public static async Task RunAsync([TimerTrigger("0 0 6 * * *", RunOnStartup = false)] TimerInfo myTimer,
+    public static async Task RunAsync([TimerTrigger("0 0 9 * * *", RunOnStartup = false)] TimerInfo myTimer,
         ILogger log)
     {
         CultureInfo.CurrentCulture = new CultureInfo("pt-BR");
@@ -75,7 +75,8 @@ public static class WeatherAlert
         foreach (var f in forecast.list)
         {
             yield return
-                $"{f.dt_txt} \t- {f.weather[0].description} - {f.main.temp:00}ºC - {f.main.humidity}% - {f.wind.speed:00.00}km/h - ~{f.main.feels_like:00}ºC";
+                $"{TimeZoneInfo.ConvertTimeFromUtc(DateTimeOffset.FromUnixTimeSeconds(f.dt).DateTime, TimeZoneInfo.FindSystemTimeZoneById("E. South America Standard Time")):G}" +
+                $" \t- {f.weather[0].description} - {f.main.temp:00}ºC - {f.main.humidity}% - {f.wind.speed:00.00}km/h - ~{f.main.feels_like:00}ºC";
             if (++count >= 6)
                 break;
         }
