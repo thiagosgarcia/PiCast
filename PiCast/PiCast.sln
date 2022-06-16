@@ -2,6 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PiCast", "PiCast.csproj", "{CCEA2076-2FF7-46F5-BC75-547483D568F4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PiCast.AlertsApp", "PiCast.AlertsApp\PiCast.AlertsApp.csproj", "{6976FFE9-D0FC-4029-B89F-CA34AA5D19ED}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +14,9 @@ Global
 		{CCEA2076-2FF7-46F5-BC75-547483D568F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CCEA2076-2FF7-46F5-BC75-547483D568F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CCEA2076-2FF7-46F5-BC75-547483D568F4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6976FFE9-D0FC-4029-B89F-CA34AA5D19ED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6976FFE9-D0FC-4029-B89F-CA34AA5D19ED}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6976FFE9-D0FC-4029-B89F-CA34AA5D19ED}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6976FFE9-D0FC-4029-B89F-CA34AA5D19ED}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

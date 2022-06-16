@@ -23,6 +23,24 @@
         <Content Include="ClientApp\src\proxy.conf.json" />
         <None Remove="$(SpaRoot)**" />
         <None Include="$(SpaRoot)**" Exclude="$(SpaRoot)node_modules\**" />
+        <None Remove="PiCast.AlertsApp\**" />
+        <Content Remove="PiCast.AlertsApp\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Remove="PiCast.AlertsApp\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Remove="PiCast.AlertsApp\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <_ContentIncludedByDefault Remove="PiCast.AlertsApp\host.json" />
+      <_ContentIncludedByDefault Remove="PiCast.AlertsApp\local.settings.json" />
+      <_ContentIncludedByDefault Remove="PiCast.AlertsApp\obj\PiCast.AlertsApp.csproj.nuget.dgspec.json" />
+      <_ContentIncludedByDefault Remove="PiCast.AlertsApp\obj\project.assets.json" />
+      <_ContentIncludedByDefault Remove="PiCast.AlertsApp\obj\project.packagespec.json" />
     </ItemGroup>
 
     <Target Name="DebugEnsureNodeEnv" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('$(SpaRoot)node_modules') ">
