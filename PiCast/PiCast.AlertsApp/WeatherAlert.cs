@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading;
@@ -21,24 +22,37 @@ public static class WeatherAlert
     {
         CultureInfo.CurrentCulture = new CultureInfo("pt-BR");
         log.LogInformation($"Initializing alerts at {DateTime.UtcNow}");
-        var data = PrepareData(log);
-        var emailBody = string.Empty;
-        await foreach (var item in data)
+        
+        var cities = Environment.GetEnvironmentVariable("CITIES").Split(",").GetEnumerator();
+        var cityData = new Dictionary<string, IAsyncEnumerable<string>>();
+        while(cities.MoveNext())
         {
-            log.LogInformation(item);
-            emailBody += $"{item}\n<br>";
+            var c = cities.Current!.ToString()!.Trim()!;
+            if (cityData.ContainsKey(c))
+                continue;
+            cityData.Add(c, PrepareData(log, c));
         }
 
         var sendEmails = bool.Parse(Environment.GetEnvironmentVariable("EMAILS_ENABLED") ?? "false");
         var tasks = new List<Task>();
         var names = Environment.GetEnvironmentVariable("EMAILS_TO_NAME").Split(",").GetEnumerator();
+        cities.Reset();
         foreach (var email in Environment.GetEnvironmentVariable("EMAILS_TO").Split(","))
         {
-            if (!names.MoveNext())
+            if (!names.MoveNext() || !cities.MoveNext())
                 break;
+            
+            var name = names.Current!.ToString()!.Trim()!;
+            var city = cities.Current!.ToString()!.Trim()!;
+            
+            var emailBody = string.Empty;
+            await foreach (var item in cityData[city])
+            {
+                log.LogInformation(item);
+                emailBody += $"{item}\n<br>";
+            }
 
-            var name = names.Current!.ToString();
-            log.LogInformation($"Sending email [{sendEmails}] to {email.Trim()}, {name.Trim()}");
+            log.LogInformation($"Sending email [{sendEmails}] to {email.Trim()}, {name}, at {city}");
 
             if (sendEmails)
                 tasks.Add(SendMail(new EmailAddress(email.Trim(), name), emailBody));
@@ -62,29 +76,28 @@ public static class WeatherAlert
         var response = await client.SendEmailAsync(msg);
     }
 
-    private static async IAsyncEnumerable<string> PrepareData(ILogger log)
+    private static async IAsyncEnumerable<string> PrepareData(ILogger log, string city)
     {
-        var weatherTask = GetWeather();
-        var forecastTask = GetForecast();
+        var weatherTask = PerformOperation<WeatherPrediction>(city, "weather");
+        var forecastTask = PerformOperation<Forecast>(city, "forecast");
         var count = 0;
 
         var weather = await weatherTask;
         yield return
-            $"Agora em {weather.name} \t- {weather.weather[0].description} - {weather.main.temp:00}ºC - {weather.main.humidity}% - {weather.wind.speed:00.00}km/h - ~{weather.main.feels_like:00}ºC";
+            $"Agora em {weather.name} \t- {weather.main.temp:00}ºC - {weather.main.humidity}% - {weather.wind.speed:00.00}km/h - ~{weather.main.feels_like:00}ºC - {weather.weather[0].description}";
         var forecast = await forecastTask;
         foreach (var f in forecast.list)
         {
             yield return
                 $"{TimeZoneInfo.ConvertTimeFromUtc(DateTimeOffset.FromUnixTimeSeconds(f.dt).DateTime, TimeZoneInfo.FindSystemTimeZoneById("E. South America Standard Time")):G}" +
-                $" \t- {f.weather[0].description} - {f.main.temp:00}ºC - {f.main.humidity}% - {f.wind.speed:00.00}km/h - ~{f.main.feels_like:00}ºC";
+                $" \t- {f.main.temp:00}ºC - {f.main.humidity}% - {f.wind.speed:00.00}km/h - ~{f.main.feels_like:00}ºC - {f.weather[0].description}";
             if (++count >= 6)
-                break;
+                yield break;
         }
     }
 
-    static async Task<WeatherPrediction> GetWeather(string operation = "weather")
+    private static async Task<T> PerformOperation<T>(string city, string operation) where T :class
     {
-        var city = "Saquarema";
         var country = "br";
         var lang = "pt";
         var unit = "metric";
@@ -98,33 +111,9 @@ public static class WeatherAlert
             BaseAddress = new Uri(Environment.GetEnvironmentVariable("OPENWEATHER_API_URL"))
         };
         var response = await client.GetAsync(request);
-
         if (!response.IsSuccessStatusCode)
             return null;
 
-        return await response.Content.ReadFromJsonAsync<WeatherPrediction>();
-    }
-
-    static async Task<Forecast> GetForecast(string operation = "forecast")
-    {
-        var city = "Saquarema";
-        var country = "br";
-        var lang = "pt";
-        var unit = "metric";
-        var apiKey = Environment.GetEnvironmentVariable("OPENWEATHER_API_KEY");
-
-        var request =
-            $"data/2.5/{operation}?q={city},{country}&APPID={apiKey}&lang={lang}&units={unit}";
-
-        var client = new HttpClient()
-        {
-            BaseAddress = new Uri(Environment.GetEnvironmentVariable("OPENWEATHER_API_URL"))
-        };
-        var response = await client.GetAsync(request);
-
-        if (!response.IsSuccessStatusCode)
-            return null;
-
-        return await response.Content.ReadFromJsonAsync<Forecast>();
+        return await response.Content.ReadFromJsonAsync<T>();
     }
 }
