@@ -17,7 +17,7 @@ namespace PiCast.AlertsApp;
 public static class WeatherAlert
 {
     [FunctionName("WeatherAlert")]
-    public static async Task RunAsync([TimerTrigger("0 0 9 * * *", RunOnStartup = false)] TimerInfo myTimer,
+    public static async Task RunAsync([TimerTrigger("10 0 9 * * *", RunOnStartup = false)] TimerInfo myTimer,
         ILogger log)
     {
         CultureInfo.CurrentCulture = new CultureInfo("pt-BR");
