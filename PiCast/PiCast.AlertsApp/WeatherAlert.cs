@@ -22,15 +22,15 @@ public static class WeatherAlert
     {
         CultureInfo.CurrentCulture = new CultureInfo("pt-BR");
         log.LogInformation($"Initializing alerts at {DateTime.UtcNow}");
-        
+
         var cities = Environment.GetEnvironmentVariable("CITIES").Split(",").GetEnumerator();
-        var cityData = new Dictionary<string, IAsyncEnumerable<string>>();
-        while(cities.MoveNext())
+        var cityData = new Dictionary<string, EmailTemplateData>();
+        while (cities.MoveNext())
         {
             var c = cities.Current!.ToString()!.Trim()!;
             if (cityData.ContainsKey(c))
                 continue;
-            cityData.Add(c, PrepareData(log, c));
+            cityData.Add(c, await PrepareTemplateData(c));
         }
 
         var sendEmails = bool.Parse(Environment.GetEnvironmentVariable("EMAILS_ENABLED") ?? "false");
@@ -41,62 +41,106 @@ public static class WeatherAlert
         {
             if (!names.MoveNext() || !cities.MoveNext())
                 break;
-            
+
             var name = names.Current!.ToString()!.Trim()!;
             var city = cities.Current!.ToString()!.Trim()!;
-            
-            var emailBody = string.Empty;
-            await foreach (var item in cityData[city])
-            {
-                log.LogInformation(item);
-                emailBody += $"{item}\n<br>";
-            }
 
             log.LogInformation($"Sending email [{sendEmails}] to {email.Trim()}, {name}, at {city}");
 
             if (sendEmails)
-                tasks.Add(SendMail(new EmailAddress(email.Trim(), name), emailBody));
+                tasks.Add(SendTemplateMail(new EmailAddress(email.Trim(), name), cityData[city]));
         }
 
         Task.WaitAll(tasks.ToArray(), new CancellationTokenSource(TimeSpan.FromMinutes(2)).Token);
         log.LogInformation($"Process finsihed {DateTime.UtcNow}");
     }
 
-    static async Task SendMail(EmailAddress to, string body)
+    static async Task SendTemplateMail(EmailAddress to, EmailTemplateData emailTemplateData)
     {
         var apiKey = Environment.GetEnvironmentVariable("SENDGRID_API_KEY");
         var client = new SendGridClient(apiKey);
         var from = new EmailAddress(Environment.GetEnvironmentVariable("EMAIL_FROM"),
             Environment.GetEnvironmentVariable("EMAIL_FROM_NAME"));
-        var subject = $"Seu relatório diário do clima para {DateTime.Now:dddd, dd MMMM}";
-        var plainTextContent = "Aqui você receberá os alertas do clima diariamente";
-        var htmlContent = $"<p>Aqui você receberá os alertas do clima <strong>diariamente</strong></p><br>" +
-                          $"<p>{body}</p>";
-        var msg = MailHelper.CreateSingleEmail(from, to, subject, plainTextContent, htmlContent);
+        var templateId = Environment.GetEnvironmentVariable("WEATHER_TEMPLATE_ID");
+        var msg = MailHelper.CreateSingleTemplateEmail(from, to, templateId, emailTemplateData);
         var response = await client.SendEmailAsync(msg);
     }
 
-    private static async IAsyncEnumerable<string> PrepareData(ILogger log, string city)
+    private static async Task<EmailTemplateData> PrepareTemplateData(string city)
     {
-        var weatherTask = PerformOperation<WeatherPrediction>(city, "weather");
-        var forecastTask = PerformOperation<Forecast>(city, "forecast");
-        var count = 0;
+        var weatherDataTask = PrepareWeatherData(city);
+        var forecastDataTask = PrepareForecastData(city);
+        var forecastList = new List<EmailData>();
+        await foreach(var f in forecastDataTask)
+            forecastList.Add(f);
 
-        var weather = await weatherTask;
-        yield return
-            $"Agora em {weather.name} \t- {weather.main.temp:00}ºC - {weather.main.humidity}% - {weather.wind.speed:00.00}km/h - ~{weather.main.feels_like:00}ºC - {weather.weather[0].description}";
-        var forecast = await forecastTask;
-        foreach (var f in forecast.list)
+        return new EmailTemplateData()
         {
-            yield return
-                $"{TimeZoneInfo.ConvertTimeFromUtc(DateTimeOffset.FromUnixTimeSeconds(f.dt).DateTime, TimeZoneInfo.FindSystemTimeZoneById("E. South America Standard Time")):G}" +
-                $" \t- {f.main.temp:00}ºC - {f.main.humidity}% - {f.wind.speed:00.00}km/h - ~{f.main.feels_like:00}ºC - {f.weather[0].description}";
+            subject = $"Seu relatório diário do clima para {DateTime.Now:dddd, dd MMMM}",
+            current = await weatherDataTask,
+            forecast = forecastList
+        };
+    }
+
+    private static async Task<EmailData> PrepareWeatherData(string city)
+    {
+        var weather = await PerformOperation<WeatherPrediction>(city, "weather");
+        return new EmailData()
+        {
+            city = weather.name,
+            humidity = weather.main.humidity.ToString("00"),
+            pressure = weather.main.pressure.ToString(),
+            temperature = weather.main.temp.ToString("00"),
+            feelsLike = weather.main.feels_like.ToString("00"),
+            tempMax = weather.main.temp_max.ToString("00"),
+            tempMin = weather.main.temp_min.ToString("00"),
+            weatherDescription = weather.weather[0].description,
+            weatherIcon = weather.weather[0].icon,
+            windDirection = weather.wind.deg.ToString("00"),
+            windSpeed = weather.wind.speed.ToString("00.00"),
+            stringWindDirection = "", //Todo
+            stringDate = TimeZoneInfo.ConvertTimeFromUtc(DateTimeOffset.FromUnixTimeSeconds(weather.dt).DateTime,
+                TimeZoneInfo.FindSystemTimeZoneById("E. South America Standard Time")).ToString("dd MMMM yyyy"),
+            stringDateTime = TimeZoneInfo.ConvertTimeFromUtc(DateTimeOffset.FromUnixTimeSeconds(weather.dt).DateTime,
+                TimeZoneInfo.FindSystemTimeZoneById("E. South America Standard Time")).ToString("G"),
+            sunrise = TimeZoneInfo.ConvertTimeFromUtc(DateTimeOffset.FromUnixTimeSeconds(weather.sys.sunrise).DateTime, 
+                TimeZoneInfo.FindSystemTimeZoneById("E. South America Standard Time")).ToString("t"),
+            sunset = TimeZoneInfo.ConvertTimeFromUtc(DateTimeOffset.FromUnixTimeSeconds(weather.sys.sunset).DateTime, 
+                TimeZoneInfo.FindSystemTimeZoneById("E. South America Standard Time")).ToString("t"),
+        };
+    }
+
+    private static async IAsyncEnumerable<EmailData> PrepareForecastData(string city)
+    {
+        var forecast = await PerformOperation<Forecast>(city, "forecast");
+        var count = 0;
+        foreach (var item in forecast.list)
+        {
+            yield return new EmailData()
+            {
+                city = forecast.city.name,
+                humidity = item.main.humidity.ToString("00"),
+                pressure = item.main.pressure.ToString(),
+                temperature = item.main.temp.ToString("00"),
+                feelsLike = item.main.feels_like.ToString("00"),
+                tempMax = item.main.temp_max.ToString("00"),
+                tempMin = item.main.temp_min.ToString("00"),
+                weatherDescription = item.weather[0].description,
+                weatherIcon = item.weather[0].icon,
+                windDirection = item.wind.deg.ToString("00"),
+                windSpeed = item.wind.speed.ToString("00.00"),
+                stringWindDirection = "", //Todo
+                stringDate = TimeZoneInfo.ConvertTimeFromUtc(DateTimeOffset.FromUnixTimeSeconds(item.dt).DateTime,
+                    TimeZoneInfo.FindSystemTimeZoneById("E. South America Standard Time")).ToString("dd MMMM yyyy"),
+                stringDateTime = TimeZoneInfo.ConvertTimeFromUtc(DateTimeOffset.FromUnixTimeSeconds(item.dt).DateTime,
+                    TimeZoneInfo.FindSystemTimeZoneById("E. South America Standard Time")).ToString("g"),
+            };
             if (++count >= 6)
                 yield break;
         }
     }
 
-    private static async Task<T> PerformOperation<T>(string city, string operation) where T :class
+    private static async Task<T> PerformOperation<T>(string city, string operation) where T : class
     {
         var country = "br";
         var lang = "pt";
