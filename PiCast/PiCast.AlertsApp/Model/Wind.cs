@@ -34,8 +34,13 @@ public class EmailData
     public string stringWindDirection { get; set; }
     public string sunrise { get; set; }
     public string sunset { get; set; }
-    
-// "stringDate": "22 de junho de 2022",
+    public string windDescription { get; set; }
+    public bool humidityAlertWarning { get; set; }
+    public bool humidityAlertAlarm { get; set; }
+    public bool windAlertWarning { get; set; }
+    public bool windAlertAlarm { get; set; }
+
+    // "stringDate": "22 de junho de 2022",
 // "stringDateTime": "22/06/2022 06:00",
 // "city": "Saquarema",
 // "weatherDescription": "céu limpo",

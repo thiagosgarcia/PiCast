@@ -98,6 +98,7 @@ public static class WeatherAlert
             weatherIcon = weather.weather[0].icon,
             windDirection = weather.wind.deg.ToString("00"),
             windSpeed = weather.wind.speed.ToString("00.00"),
+			windDescription= GetWindDescription(weather.wind.speed),
             stringWindDirection = "", //Todo
             stringDate = TimeZoneInfo.ConvertTimeFromUtc(DateTimeOffset.FromUnixTimeSeconds(weather.dt).DateTime,
                 TimeZoneInfo.FindSystemTimeZoneById("E. South America Standard Time")).ToString("dd MMMM yyyy"),
@@ -107,6 +108,69 @@ public static class WeatherAlert
                 TimeZoneInfo.FindSystemTimeZoneById("E. South America Standard Time")).ToString("t"),
             sunset = TimeZoneInfo.ConvertTimeFromUtc(DateTimeOffset.FromUnixTimeSeconds(weather.sys.sunset).DateTime, 
                 TimeZoneInfo.FindSystemTimeZoneById("E. South America Standard Time")).ToString("t"),
+			humidityAlertWarning= IsHumidityAlertWarning(weather.main.humidity),
+			humidityAlertAlarm= IsHumidityAlertAlarm(weather.main.humidity),
+			windAlertWarning= IsWindWarning(weather.wind.speed),
+			windAlertAlarm= IsWindAlarm(weather.wind.speed)
+        };
+    }
+
+    private static bool IsWindAlarm(double windSpeed)
+    {
+        return windSpeed switch
+        {
+            > 17.1 => true,
+            _ => false
+        };
+    }
+
+    private static bool IsWindWarning(double windSpeed)
+    {
+        return windSpeed switch
+        {
+            <= 7.9 => false,
+            <= 17.1 => true,
+            _ => false
+        };
+    }
+
+    private static bool IsHumidityAlertAlarm(int mainHumidity)
+    {
+        return mainHumidity switch
+        {
+            < 50 => true,
+            _ => false
+        };
+    }
+
+    private static bool IsHumidityAlertWarning(int mainHumidity)
+    {
+        return mainHumidity switch
+        {
+            // > 85 => true, //Todo -> check
+            < 50 => false,
+            < 60 => true,
+            _ => false
+        };
+    }
+
+    private static string GetWindDescription(double windSpeed)
+    {
+        return windSpeed switch
+        {
+            < 0.3 => "Calmaria",
+            <= 1.5 => "Bafagem",
+            <= 3.3 => "Leve brisa",
+            <= 5.4 => "Fraco",
+            <= 7.9 => "Moderado",
+            <= 10.7 => "Fresco",
+            <= 13.8 => "Muito fresco",
+            <= 17.1 => "Forte",
+            <= 20.7 => "Muito forte",
+            <= 24.4 => "Duro",
+            <= 28.4 => "Muito duro",
+            <= 32.6 => "Tempestuoso",
+            _ => "Furacão"
         };
     }
 
@@ -129,11 +193,16 @@ public static class WeatherAlert
                 weatherIcon = item.weather[0].icon,
                 windDirection = item.wind.deg.ToString("00"),
                 windSpeed = item.wind.speed.ToString("00.00"),
+                windDescription= GetWindDescription(item.wind.speed),
                 stringWindDirection = "", //Todo
                 stringDate = TimeZoneInfo.ConvertTimeFromUtc(DateTimeOffset.FromUnixTimeSeconds(item.dt).DateTime,
                     TimeZoneInfo.FindSystemTimeZoneById("E. South America Standard Time")).ToString("dd MMMM yyyy"),
                 stringDateTime = TimeZoneInfo.ConvertTimeFromUtc(DateTimeOffset.FromUnixTimeSeconds(item.dt).DateTime,
                     TimeZoneInfo.FindSystemTimeZoneById("E. South America Standard Time")).ToString("g"),
+                humidityAlertWarning= IsHumidityAlertWarning(item.main.humidity),
+                humidityAlertAlarm= IsHumidityAlertAlarm(item.main.humidity),
+                windAlertWarning= IsWindWarning(item.wind.speed),
+                windAlertAlarm= IsWindAlarm(item.wind.speed)
             };
             if (++count >= 6)
                 yield break;
