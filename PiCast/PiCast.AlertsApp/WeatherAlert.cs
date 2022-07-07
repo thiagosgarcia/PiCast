@@ -71,7 +71,7 @@ public static class WeatherAlert
         var weatherDataTask = PrepareWeatherData(city);
         var forecastDataTask = PrepareForecastData(city);
         var forecastList = new List<EmailData>();
-        await foreach(var f in forecastDataTask)
+        await foreach (var f in forecastDataTask)
             forecastList.Add(f);
 
         return new EmailTemplateData()
@@ -98,20 +98,20 @@ public static class WeatherAlert
             weatherIcon = weather.weather[0].icon,
             windDirection = weather.wind.deg.ToString("00"),
             windSpeed = weather.wind.speed.ToString("00.00"),
-			windDescription= GetWindDescription(weather.wind.speed),
+            windDescription = GetWindDescription(weather.wind.speed),
             stringWindDirection = "", //Todo
             stringDate = TimeZoneInfo.ConvertTimeFromUtc(DateTimeOffset.FromUnixTimeSeconds(weather.dt).DateTime,
                 TimeZoneInfo.FindSystemTimeZoneById("E. South America Standard Time")).ToString("dd MMMM yyyy"),
             stringDateTime = TimeZoneInfo.ConvertTimeFromUtc(DateTimeOffset.FromUnixTimeSeconds(weather.dt).DateTime,
                 TimeZoneInfo.FindSystemTimeZoneById("E. South America Standard Time")).ToString("G"),
-            sunrise = TimeZoneInfo.ConvertTimeFromUtc(DateTimeOffset.FromUnixTimeSeconds(weather.sys.sunrise).DateTime, 
+            sunrise = TimeZoneInfo.ConvertTimeFromUtc(DateTimeOffset.FromUnixTimeSeconds(weather.sys.sunrise).DateTime,
                 TimeZoneInfo.FindSystemTimeZoneById("E. South America Standard Time")).ToString("t"),
-            sunset = TimeZoneInfo.ConvertTimeFromUtc(DateTimeOffset.FromUnixTimeSeconds(weather.sys.sunset).DateTime, 
+            sunset = TimeZoneInfo.ConvertTimeFromUtc(DateTimeOffset.FromUnixTimeSeconds(weather.sys.sunset).DateTime,
                 TimeZoneInfo.FindSystemTimeZoneById("E. South America Standard Time")).ToString("t"),
-			humidityAlertWarning= IsHumidityAlertWarning(weather.main.humidity),
-			humidityAlertAlarm= IsHumidityAlertAlarm(weather.main.humidity),
-			windAlertWarning= IsWindWarning(weather.wind.speed),
-			windAlertAlarm= IsWindAlarm(weather.wind.speed)
+            humidityAlertWarning = IsHumidityAlertWarning(weather.main.humidity),
+            humidityAlertAlarm = IsHumidityAlertAlarm(weather.main.humidity),
+            windAlertWarning = IsWindWarning(weather.wind.speed),
+            windAlertAlarm = IsWindAlarm(weather.wind.speed)
         };
     }
 
@@ -180,6 +180,13 @@ public static class WeatherAlert
         var count = 0;
         foreach (var item in forecast.list)
         {
+            var stringDateTime = TimeZoneInfo.ConvertTimeFromUtc(DateTimeOffset.FromUnixTimeSeconds(item.dt).DateTime,
+                TimeZoneInfo.FindSystemTimeZoneById("E. South America Standard Time")).ToString("g");
+            var currentStringDateTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow,
+                TimeZoneInfo.FindSystemTimeZoneById("E. South America Standard Time")).ToString("g");
+            if (stringDateTime == currentStringDateTime)
+                continue;
+
             yield return new EmailData()
             {
                 city = forecast.city.name,
@@ -193,16 +200,15 @@ public static class WeatherAlert
                 weatherIcon = item.weather[0].icon,
                 windDirection = item.wind.deg.ToString("00"),
                 windSpeed = item.wind.speed.ToString("00.00"),
-                windDescription= GetWindDescription(item.wind.speed),
+                windDescription = GetWindDescription(item.wind.speed),
                 stringWindDirection = "", //Todo
                 stringDate = TimeZoneInfo.ConvertTimeFromUtc(DateTimeOffset.FromUnixTimeSeconds(item.dt).DateTime,
                     TimeZoneInfo.FindSystemTimeZoneById("E. South America Standard Time")).ToString("dd MMMM yyyy"),
-                stringDateTime = TimeZoneInfo.ConvertTimeFromUtc(DateTimeOffset.FromUnixTimeSeconds(item.dt).DateTime,
-                    TimeZoneInfo.FindSystemTimeZoneById("E. South America Standard Time")).ToString("g"),
-                humidityAlertWarning= IsHumidityAlertWarning(item.main.humidity),
-                humidityAlertAlarm= IsHumidityAlertAlarm(item.main.humidity),
-                windAlertWarning= IsWindWarning(item.wind.speed),
-                windAlertAlarm= IsWindAlarm(item.wind.speed)
+                stringDateTime = stringDateTime,
+                humidityAlertWarning = IsHumidityAlertWarning(item.main.humidity),
+                humidityAlertAlarm = IsHumidityAlertAlarm(item.main.humidity),
+                windAlertWarning = IsWindWarning(item.wind.speed),
+                windAlertAlarm = IsWindAlarm(item.wind.speed)
             };
             if (++count >= 6)
                 yield break;
